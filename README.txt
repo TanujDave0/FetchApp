@@ -26,3 +26,5 @@ Things to note:
 - Results appear as -- id | listId | name
 - This apps has persistent database storage, thus if you reopen the app, it will have the database from the previous run. Clear the database to see updated query results as required.
 - The query does not change the database, thus changing the toggle switch on or off to display all or just the query rows will not alter the database
+
+my email: tdave6@Uic.edu
