@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Fetch</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="fetchButton">Fetch</string>
+    <string name="GoToFetch">Fetch Screen</string>
+    <string name="fetch_text">
+        Welcome to my Fetch Take Home Application.\n\n
+        I hope you like the simple application and design.\n\n
+        Please use the Fetch button below to fetch from the url.
+    </string>
+</resources>
