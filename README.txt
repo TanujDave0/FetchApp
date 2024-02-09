@@ -11,7 +11,7 @@ Toggle switch - When off displays the query rows, when on displays all the rows
 Results appear as -- id | listId | name
 
 A simple explanation of the structure/files:
-1 activity - main avticity
+2 activitues - main activity, help activity
 1 fragement - FirstFrag, bound to the main activity
 SQLHelper - SQLlite helper. Creates, stores and retrieves data
 fRow - class to store each row
