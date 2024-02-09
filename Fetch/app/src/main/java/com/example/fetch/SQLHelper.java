@@ -88,6 +88,8 @@ public class SQLHelper extends SQLiteOpenHelper {
             } while (cursor.moveToNext());
         }
 
+        cursor.close();
+
         return ans;
     }
 
@@ -118,9 +120,14 @@ public class SQLHelper extends SQLiteOpenHelper {
             } while (cursor.moveToNext());
         }
 
+        cursor.close();
+
         return ans;
     }
 
+    public void clearDatabase() {
+        this.getWritableDatabase().execSQL("DELETE FROM " + table_name);
+    }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {

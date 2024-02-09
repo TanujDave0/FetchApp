@@ -17,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import org.json.JSONArray;
@@ -31,8 +32,11 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.logging.Logger;
 
 
@@ -50,7 +54,7 @@ public class FirstFrag extends Fragment {
 
     private static final String urlStr = "https://fetch-hiring.s3.amazonaws.com/hiring.json";
 
-    ExecutorService executorService = Executors.newFixedThreadPool(4);
+
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -58,7 +62,15 @@ public class FirstFrag extends Fragment {
 
     private Button ffb;
 
+    private Button delete_button;
+
     private TextView fetchText;
+
+    private Switch fwSwitch;
+
+    boolean check = true;
+
+//    List<Future<?>> futures = new ArrayList<Future<?>>();
 
     private static SQLHelper database;
 
@@ -105,24 +117,80 @@ public class FirstFrag extends Fragment {
 
         fetchText.setMovementMethod(new ScrollingMovementMethod());
 
+        fwSwitch = view.findViewById(R.id.fw_switch);
+
+        delete_button = view.findViewById(R.id.delete_button);
+
+        delete_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (check) {
+                    disableButtons();
+
+                    deleteDatabase(); // delete the databse
+                    fetchText.setText(R.string.fetch_text); // set the text back to welcome message
+
+                    enableButtons();
+                }
+            }
+        });
+
+        fwSwitch.setOnCheckedChangeListener( (buttonView, checked) -> {
+            if (check) {
+                disableButtons();
+
+                if (checked) {
+                    displayAllRows();
+                } else {
+                    displayTheQuery();
+                }
+
+                enableButtons();
+            }
+        });
+
         ffb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                executorService.execute(new Runnable() {
-                        @Override
-                        public void run() {
-                            JSONArray response = fetchFromUrl();
-                            fetchText.setText("entering data into the database...");
+                if (!check) return; // already fetching
 
-                            if (response != null) {
-                                try {
-                                    afterFetch(response);
-                                } catch (JSONException e) {
-                                    throw new RuntimeException(e);
-                                }
-                            }
-                        }
-                    }
+                check = false;
+
+                ExecutorService executorService = Executors.newFixedThreadPool(2);
+
+                executorService.submit(new Runnable() {
+                       @Override
+                       public void run() {
+
+                           Future<?> f = executorService.submit(new Runnable() {
+                               @Override
+                               public void run() {
+                                   JSONArray response = fetchFromUrl();
+                                   fetchText.setText("entering data into the database...");
+
+                                   if (response != null) {
+                                       try {
+                                           afterFetch(response);
+                                       } catch (JSONException e) {
+                                           throw new RuntimeException(e);
+                                       }
+                                   }
+                               }
+                           });
+
+                           try {
+                               f.get();
+                           } catch (ExecutionException e) {
+                               throw new RuntimeException(e);
+                           } catch (InterruptedException e) {
+                               throw new RuntimeException(e);
+                           }
+
+                           check = true;
+
+                       }
+
+                   }
                 );
             }
         });
@@ -130,6 +198,24 @@ public class FirstFrag extends Fragment {
         database = new SQLHelper(getActivity());
 
         return view;
+    }
+
+    private void disableButtons() {
+        fwSwitch.setEnabled(false);
+        ffb.setEnabled(false);
+        delete_button.setEnabled(false);
+    }
+
+    private void enableButtons() {
+        fwSwitch.setEnabled(true);
+        ffb.setEnabled(true);
+        delete_button.setEnabled(true);
+    }
+
+    private void deleteDatabase() {
+        if (check) {
+            database.clearDatabase();
+        }
     }
 
     public JSONArray fetchFromUrl() {
@@ -184,11 +270,11 @@ public class FirstFrag extends Fragment {
         ArrayList<fRow> rows = database.fetchQuery();
 
         if (rows.size() == 0) {
-            fetchText.setText("no rows display :)");
+            fetchText.setText("no rows to display, try fetching first :)");
             return;
         }
 
-        String text = "Please scroll to see more..\n\n\nid  |  listID  |  name\n\n";
+        String text = "Displaying query rows\nPlease scroll to see more..\n\n\nid  |  listID  |  name\n\n";
 
         for (int i = 0; i < rows.size(); i++) {
             fRow row = rows.get(i);
@@ -220,11 +306,11 @@ public class FirstFrag extends Fragment {
         ArrayList<fRow> rows = database.getAll();
 
         if (rows.size() == 0) {
-            fetchText.setText("no rows to display :)");
+            fetchText.setText("no rows to display, try fetching first :)");
             return;
         }
 
-        String text = "Please scroll to see more..\n\n\n";
+        String text = "Displaying all rows\nPlease scroll to see more..\n\n\nid  |  listID  |  name\n\n";
 
         for (int i = 0; i < rows.size(); i++) {
             fRow row = rows.get(i);
@@ -256,8 +342,12 @@ public class FirstFrag extends Fragment {
         database.addRows(response);
         fetchText.setText("Data entered into the database, now displaying...");
 
-//        displayAllRows();
-        displayTheQuery();
+
+        if (fwSwitch.isChecked()) {
+            displayAllRows();
+        } else {
+            displayTheQuery();
+        }
     }
 
     @Override

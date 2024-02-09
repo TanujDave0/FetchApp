@@ -5,8 +5,21 @@
     <string name="fetchButton">Fetch</string>
     <string name="GoToFetch">Fetch Screen</string>
     <string name="fetch_text">
-        Welcome to my Fetch Take Home Application.\n\n
-        I hope you like the simple application and design.\n\n
-        Please use the Fetch button below to fetch from the url.
+        Welcome to my Fetch Take Home Application.
+        \n\nI hope you like the simple application and design.
+        \n\nPlease use the Fetch button below to fetch from the url.
     </string>
+    <string name="switch_text">All</string>
+    <string name="delete_button">Clear Database</string>
+    <string name="help_text">
+        Instructions:
+        \n\nFetch Button: fetches the contents from the URL and add them to the EXISTING database.
+        \n\nClear Database Button: clears all the rows from the SQL database
+        \n\nAll switch: in On state displays all the rows, in off state displays the fetch query
+        \n\nFloating ?: Help button, brings you to this page
+        \n\nAll the buttons and switches on the main page will have no effect when the fetch query is being run, they are still interactable.
+        \n\nThe Go Back button on this page will lead you back to the main page, alternatively you can also just press the back button on your device
+    </string>
+    <string name="back_key">Go Back</string>
+
 </resources>
